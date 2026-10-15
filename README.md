@@ -1,0 +1,52 @@
+# Al-Falah GlobalAI — English for Guinea (PWA, v8 rebuild)
+
+Duolingo-style English learning app: French / Pular / Susu / Maninka base language, skill path (6 units, 15 lessons),
+streak, XP, hearts (1 heart / 20 min), 6 exercise types, confetti, **fully offline** after first visit.
+Bundle: ~14 KB gzipped (no framework, no web fonts, no images except the app icon).
+
+## Run
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # → dist/  (includes auto-generated offline service worker)
+npm run preview    # test the production build (offline mode works here, not in dev)
+```
+
+## Deploy (any static host, HTTPS required for PWA install)
+- **Netlify**: drag & drop the `dist/` folder at app.netlify.com/drop — or connect the repo (`netlify.toml` is ready).
+- **Vercel**: `npx vercel --prod` (`vercel.json` is ready).
+- **Cloudflare Pages / GitHub Pages**: build command `npm run build`, output `dist` (paths are relative, works in sub-folders).
+
+## Where to edit
+| What | File |
+|---|---|
+| Words & phrases (+ Pular/Susu/Maninka) | `src/data/vocab.js` |
+| Units & lessons order | `src/data/curriculum.js` |
+| Interface texts per language | `src/data/ui.js` |
+| Exercise generation | `src/engine/exercises.js` |
+| Hearts / streak / XP rules | `src/engine/state.js` (`REGEN_MS`, `MAX_HEARTS`) |
+| Colours / look | `src/style.css` (`:root` variables) |
+
+Missing local-language entries automatically fall back to French — add a field (`pul:`, `sus:`, `man:`) and it appears.
+**Read `TRANSLATION_REVIEW.md` before public launch.**
+
+## Storage
+Progress lives in `localStorage` (key `anglais-gn-v1`): tiny, synchronous, offline. IndexedDB is not needed at this size.
+
+## What changed vs. v7 (the single-file app)
+| v7 | v8 (this rebuild) |
+|---|---|
+| 4 modules, one lesson format | 12 units / 23 lessons, skill path, 8 exercise types |
+| Browser called `api.anthropic.com` with no key (always failed → English fallback) | Removed. Local-language content is human-reviewed data files, no AI call |
+| Stripe script + 3 Google Fonts loaded on every visit | Nothing external. System fonts, zero third-party requests |
+| 45 AI-translated languages | French + Pular / Susu / Maninka (partial, see TRANSLATION_REVIEW.md) |
+| Login + Stripe paywall (backend not deployed) | No accounts, no paywall: free & private, progress stays on the phone |
+| 191 KB single HTML | ~16 KB gzipped |
+Kept from v7: navy/gold brand, the 4 real-life modules (supermarket, doctor, job interview, renting) with their grammar
+tips, IPA pronunciation and reading documents, speech scoring, streak/XP, install-to-home-screen.
+New: Guinea units (Getting Around, Phone & Mobile Money), hearts, smart review of missed words.
+
+## Monetisation (when you're ready)
+Stripe cards are rare in Guinea. Options that fit the market: Orange Money / MTN MoMo manual unlock code per user,
+sponsored lessons from local businesses (your agency's SMB clients), or a school/NGO licence. Accounts + a backend
+are only needed for paid unlocks; tell me which model and I'll add it.
