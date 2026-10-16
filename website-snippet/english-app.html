@@ -126,8 +126,9 @@ footer{border-top:1px solid var(--line);padding:22px 0;text-align:center;color:v
      Examples:  'https://wa.me/224XXXXXXXXX'   (WhatsApp, digits only, with country code)
                 'mailto:you@yourdomain.com?subject=English%20app%20feedback'
                 'https://yourdomain.com/your-real-contact-page'
-     While it is empty, the feedback buttons are hidden, so nobody lands on a broken link. */
-  var FEEDBACK_URL='';
+     While it is empty, the feedback buttons are hidden, so nobody lands on a broken link.
+     Currently: WhatsApp +224 611 351 302 (swap the digits to use the other number: 12402806137). */
+  var FEEDBACK_URL='https://wa.me/224611351302?text=Hello%2C%20I%20tested%20the%20Al-Falah%20English%20app.%20My%20feedback%3A%20';
   document.querySelectorAll('a[data-feedback]').forEach(function(a){
     if(FEEDBACK_URL){a.href=FEEDBACK_URL; if(/^https?:/.test(FEEDBACK_URL)){a.target='_blank';a.rel='noopener';}}
     else a.style.display='none';
