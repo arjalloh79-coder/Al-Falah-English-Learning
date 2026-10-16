@@ -4,7 +4,8 @@ import { getState, update, noteWord, loseHeart, gainHeart, completeLesson, curre
 import { norm, wordOverlap } from '../engine/exercises.js';
 import { sfx, speak, ttsAvailable } from '../engine/audio.js';
 import { confetti, modal } from './shell.js';
-import { fmtMs } from './shell.js';
+import { fmtMs, sponsorCard } from './shell.js';
+import { track } from '../engine/track.js';
 import { msToNextHeart } from '../engine/state.js';
 
 const spk = (text, cls = '') => h('button', { class: `spk ${cls}`, 'aria-label': 'Écouter', onclick: () => { if (!speak(text) || !ttsAvailable()) hint(); } }, '🔊');
@@ -95,10 +96,12 @@ function mark(list, b) { list.forEach((x) => x.classList.toggle('sel', x === b))
 
 export function runLesson({ id, exercises, practice, tip: lessonTip }, onExit) {
   const total = exercises.length; let queue = [...exercises], done = 0, mistakes = 0, hrtLost = false;
+  const t0 = Date.now(); let tq = t0;
+  track('lesson_start', { id });
   const bar = h('i'), footer = h('footer', { class: 'foot' }), body = h('main', { class: 'screen lessonbody' });
   const close = h('button', { class: 'x', 'aria-label': 'Quitter', onclick: () => {
     const c = modal([h('h2', null, t('quit')), h('p', { class: 'muted' }, t('quitSub')),
-      h('button', { class: 'btn primary', onclick: () => c() }, t('stay')), h('button', { class: 'btn ghost danger', onclick: () => { c(); onExit(); } }, t('leave'))]);
+      h('button', { class: 'btn primary', onclick: () => c() }, t('stay')), h('button', { class: 'btn ghost danger', onclick: () => { track('lesson_quit', { id, done, total }); c(); onExit(); } }, t('leave'))]);
   } }, '✕');
   const heartsEl = h('span', { class: 'stat red' });
   const refreshHearts = () => { heartsEl.textContent = `❤️ ${getState().hearts}`; };
@@ -113,11 +116,11 @@ export function runLesson({ id, exercises, practice, tip: lessonTip }, onExit) {
   }
   function step() {
     if (!queue.length) return finish();
-    refreshHearts(); bar.style.width = `${(done / total) * 100}%`;
+    refreshHearts(); bar.style.width = `${(done / total) * 100}%`; tq = Date.now();
     const ex = queue[0], rs = {}; let btn, resolved = false;
     const ui = {
       enable: () => btn && (btn.disabled = false), disable: () => btn && (btn.disabled = true),
-      submit: () => btn && !btn.disabled && btn.click(), penalty: () => { if (!hrtLost) { hrtLost = true; mistakes++; loseOne(); } },
+      submit: () => btn && !btn.disabled && btn.click(), penalty: () => { if (!hrtLost) { hrtLost = true; mistakes++; track('answer', { lesson: id, type: 'match', ok: 0 }); loseOne(); } },
       finish: () => { resolved = true; feedback(true, '', true); },
     };
     const r = R[ex.type](ex, ui); Object.assign(rs, r);
@@ -132,6 +135,7 @@ export function runLesson({ id, exercises, practice, tip: lessonTip }, onExit) {
       body.querySelectorAll('input,button.opt,button.chip').forEach((x) => (x.disabled = true));
       ok ? sfx.ok() : sfx.bad();
       noteWord(ex.word?.k || ex.answer, ok);
+      track('answer', { lesson: id, type: ex.type, k: ex.word?.k || ex.answer || undefined, ok: ok ? 1 : 0, ms: Math.min(Date.now() - tq, 120000) });
       if (!ok) { mistakes++; if (!fromMatch && loseOne()) return; }
       if (fromMatch && !ok) { /* hearts already deducted in penalty() */ }
       const nextBtn = h('button', { class: `btn big ${ok ? 'primary' : 'danger-solid'}`, onclick: () => {
@@ -143,6 +147,7 @@ export function runLesson({ id, exercises, practice, tip: lessonTip }, onExit) {
     }
   }
   function outOfHearts() {
+    track('out_of_hearts', { id });
     footer.replaceChildren();
     body.replaceChildren(h('div', { class: 'center pad' }, h('div', { class: 'emoji' }, '💔'), h('h2', null, t('outOfHearts')),
       h('p', { class: 'muted' }, `${t('heartsBack')} ${fmtMs(msToNextHeart())}`), h('button', { class: 'btn primary', onclick: onExit }, t('done'))));
@@ -153,12 +158,14 @@ export function runLesson({ id, exercises, practice, tip: lessonTip }, onExit) {
     const xp = practice ? 5 : 10 + (mistakes === 0 ? 5 : 0);
     let info = { streak: currentStreak() };
     if (practice) { gainHeart(); update({ xp: getState().xp + xp }); } else info = completeLesson(id, xp, mistakes === 0);
+    track('lesson_complete', { id, xp, acc, mis: mistakes, ms: Math.min(Date.now() - t0, 3600000) });
     sfx.win(); confetti();
     footer.className = 'foot'; footer.replaceChildren(h('button', { class: 'btn primary big', onclick: onExit }, t('continue')));
     body.replaceChildren(h('div', { class: 'center pad win' }, h('div', { class: 'emoji bounce' }, '🏆'), h('h1', null, t('lessonComplete')),
       h('div', { class: 'tiles' }, h('div', { class: 'tile y' }, h('b', null, `⚡ +${xp}`), h('small', null, t('xpEarned'))), h('div', { class: 'tile g' }, h('b', null, `🎯 ${acc}%`), h('small', null, t('accuracy'))),
         h('div', { class: 'tile o' }, h('b', null, `🔥 ${info.streak}`), h('small', null, t('streakDays')))),
-      info.firstToday && info.streak > 1 ? h('p', { class: 'streakmsg' }, `🔥 ${t('legendary')}`) : null));
+      info.firstToday && info.streak > 1 ? h('p', { class: 'streakmsg' }, `🔥 ${t('legendary')}`) : null,
+      sponsorCard('complete')));
     refreshHearts();
   }
   showTip();

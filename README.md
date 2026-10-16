@@ -50,3 +50,8 @@ New: Guinea units (Getting Around, Phone & Mobile Money), hearts, smart review o
 Stripe cards are rare in Guinea. Options that fit the market: Orange Money / MTN MoMo manual unlock code per user,
 sponsored lessons from local businesses (your agency's SMB clients), or a school/NGO licence. Accounts + a backend
 are only needed for paid unlocks; tell me which model and I'll add it.
+
+## Sponsors and usage tracking (v8.1)
+- **Sponsor slots:** edit `src/data/sponsors.js` to add a paying sponsor (card on the lesson-complete screen and/or a "Presented by" chip on a unit). With no sponsor, a small "Become a sponsor" house ad shows; set `SHOW_HOUSE_AD = false` to hide it.
+- **Sponsor pitch (EN/FR, one page):** `sponsor-kit/`. Edit the prices in the HTML, then re-export the PDF.
+- **Usage dashboard:** `collector/` (PHP + SQLite for Hostinger). See `collector/README.md`. Disabled until `VITE_ANALYTICS_URL` is set.

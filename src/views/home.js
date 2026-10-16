@@ -4,6 +4,9 @@ import { getState, msToNextHeart } from '../engine/state.js';
 import { t } from '../i18n.js';
 import { topbar, goalBar, nav, toast, modal, fmtMs } from './shell.js';
 import { buildPractice } from '../engine/exercises.js';
+import { unitSponsor } from '../data/sponsors.js';
+import { track } from '../engine/track.js';
+const seen = new Set();
 
 export function home(go, startLesson, startPractice) {
   const s = getState();
@@ -25,7 +28,10 @@ export function home(go, startLesson, startPractice) {
     });
     return h('section', { class: 'unit' },
       h('div', { class: 'unithead', style: `background:${u.color}` },
-        h('div', null, h('small', null, `${u.emoji}  ${UNITS.indexOf(u) + 1}`), h('b', null, u.title.fr), h('small', null, u.title.en))),
+        h('div', null, h('small', null, `${u.emoji}  ${UNITS.indexOf(u) + 1}`), h('b', null, u.title.fr), h('small', null, u.title.en),
+          (() => { const sp = unitSponsor(u.id); if (!sp) return null;
+            if (!seen.has(sp.id)) { seen.add(sp.id); track('sponsor_impression', { s: sp.id, place: 'unit' }); }
+            return h('a', { class: 'unit-sp', href: sp.url, target: '_blank', rel: 'noopener sponsored', onclick: () => track('sponsor_click', { s: sp.id, place: 'unit' }) }, `${t('presentedBy')} ${sp.emoji || ''} ${sp.name}`); })())),
       h('div', { class: 'nodes' }, nodes));
   });
   const doneIds = Object.keys(s.done);
