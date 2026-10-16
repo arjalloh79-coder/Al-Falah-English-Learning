@@ -28,4 +28,4 @@ Whatever you use to push files, send these exact files into `public_html` next t
 - Loads fast on mobile data, no sideways scroll.
 - The EN / FR buttons switch the language, and the choice is remembered.
 - "Try the app free" opens https://english.al-falahmarketing.com/
-- "Send your feedback" opens your contact page. Change that link in the file if you prefer WhatsApp.
+- The "Send your feedback" button stays hidden until you set `FEEDBACK_URL` near the bottom of `english-app.html` (WhatsApp, email or a real contact page). See the comment there.

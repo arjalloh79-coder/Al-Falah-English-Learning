@@ -112,7 +112,7 @@ footer{border-top:1px solid var(--line);padding:22px 0;text-align:center;color:v
     <h2 style="margin-bottom:14px" data-en="Ready to try it?" data-fr="Prêt à l'essayer ?">Ready to try it?</h2>
     <div class="btns">
       <a class="btn p" href="https://english.al-falahmarketing.com/" target="_blank" rel="noopener" data-en="Try the app free" data-fr="Essayer l'application gratuitement">Try the app free</a>
-      <a class="btn g" href="https://www.al-falahmarketing.com/contact" data-en="Send your feedback" data-fr="Envoyer votre avis">Send your feedback</a>
+      <a class="btn g" href="#feedback" data-feedback data-en="Send your feedback" data-fr="Envoyer votre avis">Send your feedback</a>
     </div>
   </div>
 </div>
@@ -122,6 +122,16 @@ footer{border-top:1px solid var(--line);padding:22px 0;text-align:center;color:v
 
 <script>
 (function(){
+  /* ===== SET YOUR FEEDBACK LINK HERE (one line) =====
+     Examples:  'https://wa.me/224XXXXXXXXX'   (WhatsApp, digits only, with country code)
+                'mailto:you@yourdomain.com?subject=English%20app%20feedback'
+                'https://yourdomain.com/your-real-contact-page'
+     While it is empty, the feedback buttons are hidden, so nobody lands on a broken link. */
+  var FEEDBACK_URL='';
+  document.querySelectorAll('a[data-feedback]').forEach(function(a){
+    if(FEEDBACK_URL){a.href=FEEDBACK_URL; if(/^https?:/.test(FEEDBACK_URL)){a.target='_blank';a.rel='noopener';}}
+    else a.style.display='none';
+  });
   var KEY='afel-lang', els=document.querySelectorAll('[data-en],[data-en-html]'), btns=document.querySelectorAll('.lang button');
   function set(l){
     document.documentElement.lang=l;
