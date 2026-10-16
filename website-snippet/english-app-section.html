@@ -1,0 +1,39 @@
+<!-- Al-Falah English app: paste anywhere in your site's HTML. Self-contained (scoped .afel-* styles, no external files). -->
+<!-- TODO before publishing: replace FEEDBACK_LINK below (e.g. https://wa.me/224XXXXXXXXX or a form link). -->
+<section class="afel" id="english-app" aria-labelledby="afel-title">
+  <style>
+    .afel{--navy:#0D1B2A;--card:#16293D;--line:#254260;--gold:#C9963A;--gold2:#E8B455;--ivory:#F5EDD8;
+      background:var(--navy);color:var(--ivory);padding:48px 16px;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+    .afel *{box-sizing:border-box}
+    .afel-wrap{max-width:760px;margin:0 auto;text-align:center}
+    .afel-badge{display:inline-block;background:rgba(201,150,58,.15);color:var(--gold2);border:1px solid var(--gold);
+      border-radius:999px;padding:4px 14px;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+    .afel h2{font:700 clamp(26px,6vw,40px)/1.15 Georgia,"Times New Roman",serif;margin:16px 0 12px;color:var(--ivory)}
+    .afel h2 span{color:var(--gold)}
+    .afel p{margin:0 auto 14px;max-width:620px;color:#e6dcc3;font-size:17px}
+    .afel-note{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;
+      padding:16px 18px;margin:22px auto;text-align:left;max-width:620px}
+    .afel-note b{color:var(--gold2)}
+    .afel-actions{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:22px}
+    .afel-btn{display:inline-block;min-height:48px;padding:13px 24px;border-radius:14px;font-weight:800;text-decoration:none;font-size:16px}
+    .afel-btn.primary{background:var(--gold);color:var(--navy);box-shadow:0 4px 0 #8A621E}
+    .afel-btn.ghost{border:2px solid var(--gold);color:var(--gold2)}
+    .afel-btn:focus-visible{outline:3px solid var(--gold2);outline-offset:3px}
+    .afel .afel-small{font-size:14px;color:#b9ad90;margin-top:22px}
+    @media (max-width:480px){.afel-btn{width:100%;text-align:center}}
+  </style>
+  <div class="afel-wrap">
+    <span class="afel-badge">Beta · Testers wanted</span>
+    <h2 id="afel-title">Free English Learning for Beginners <span>in Guinea</span></h2>
+    <p>Short lessons, a daily streak and games, in French, Pular, Susu or Maninka. It works on any phone, even with a weak connection.</p>
+    <div class="afel-note">
+      <b>We need your opinion.</b> This app is brand new and we are looking for people to test it and tell us what they think:
+      what is easy, what is confusing, and what you would like to learn next. It takes about 5 minutes.
+    </div>
+    <div class="afel-actions">
+      <a class="afel-btn primary" href="https://english.al-falahmarketing.com/" target="_blank" rel="noopener">Try the app free</a>
+      <a class="afel-btn ghost" href="FEEDBACK_LINK" target="_blank" rel="noopener">Send your feedback</a>
+    </div>
+    <p class="afel-small">Tip: open the link on your phone, then tap “Add to Home screen” to use it like an app.</p>
+  </div>
+</section>
