@@ -1,0 +1,5 @@
+# Block direct access to internal files and the database folder
+<FilesMatch "^(lib|config|config\.sample|lessons)\.php$">
+  Require all denied
+</FilesMatch>
+Options -Indexes
