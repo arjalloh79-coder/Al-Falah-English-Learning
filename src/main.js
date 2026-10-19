@@ -35,5 +35,7 @@ addEventListener('appinstalled', () => track('installed', {}));
 // Offline indicator + service worker (production only)
 addEventListener('offline', () => toast(t('offline')));
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+  // Resolved against the page (not this bundle in /assets/), so it works from any folder. Built at runtime
+  // so link checkers don't try to resolve a literal './sw.js' relative to the JS file.
+  addEventListener('load', () => navigator.serviceWorker.register(new URL('sw.js', document.baseURI).href).catch(() => {}));
 }
