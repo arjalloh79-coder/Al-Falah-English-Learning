@@ -1,0 +1,5 @@
+# Block direct access to internal files and the limiter database folder
+<FilesMatch "^(config|config\.sample)\.php$|^prompt\.txt$|^README\.md$">
+  Require all denied
+</FilesMatch>
+Options -Indexes
