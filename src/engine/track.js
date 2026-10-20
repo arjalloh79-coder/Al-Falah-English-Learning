@@ -1,6 +1,7 @@
 // Anonymous, consent-based usage tracking. Offline-first: events queue locally and are sent in batches
 // when the phone is online. Disabled entirely unless ANALYTICS_URL is set. Never stores phone, GPS or IP.
 import { ANALYTICS_URL, APP_VERSION } from '../config.js';
+import { getState } from './state.js';
 
 const K = 'anglais-gn-track', Q = 'anglais-gn-queue', MAX_Q = 600, BATCH = 60;
 const rnd = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => ((Math.random() * 16) | 0).toString(16)));
@@ -41,7 +42,7 @@ export async function flush() {
   sending = true;
   try {
     const batch = queue.slice(0, BATCH);
-    const ok = await post({ uid: id.uid, sid, v: APP_VERSION, name: id.name,
+    const ok = await post({ uid: id.uid, sid, v: APP_VERSION, name: id.name, ul: getState().lang || '',
       dev: { w: innerWidth, h: innerHeight, lang: navigator.language, pwa: matchMedia('(display-mode: standalone)').matches ? 1 : 0 }, events: batch });
     if (ok) { queue = queue.slice(batch.length); wr(Q, queue); if (queue.length) { sending = false; return flush(); } }
   } catch { /* offline or server down: keep the queue, retry later */ }
