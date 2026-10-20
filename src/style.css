@@ -112,3 +112,5 @@ input[type=checkbox]{width:26px;height:26px;accent-color:var(--g)}
 .unit-sp{display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:#0D1B2A;background:rgba(255,255,255,.35);padding:2px 10px;border-radius:999px;text-decoration:none}
 .txt.sm{width:55%;padding:8px 10px;font-size:15px}
 .screen.center .txt{margin:14px 0}
+a.btn{text-align:center;text-decoration:none}
+a.muted{display:inline-block;margin:6px 0 12px;color:var(--y);text-decoration:underline;font-size:14px}

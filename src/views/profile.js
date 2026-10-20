@@ -6,6 +6,7 @@ import { topbar, nav } from './shell.js';
 import { ALL_LESSONS } from '../data/curriculum.js';
 import { trackEnabled, hasConsent, setConsent, setName, trackName, forgetMe } from '../engine/track.js';
 import { toast } from './shell.js';
+import { PRIVACY_URL } from '../config.js';
 
 let deferred;
 addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; });
@@ -23,6 +24,7 @@ export function profile(go, relaunch) {
     trackEnabled() ? h('label', { class: 'row' }, t('shareUsage'), h('input', { type: 'checkbox', checked: hasConsent(), onchange: (e) => { setConsent(e.target.checked, trackName()); go('profile'); } })) : null,
     trackEnabled() && hasConsent() ? h('label', { class: 'row' }, t('yourName'), h('input', { class: 'txt sm', type: 'text', maxlength: 40, value: trackName(), onchange: (e) => setName(e.target.value) })) : null,
     trackEnabled() ? h('button', { class: 'btn ghost', onclick: async () => { await forgetMe(); toast(t('forgotten')); } }, `🗑️ ${t('forgetMe')}`) : null,
+    trackEnabled() ? h('a', { class: 'btn ghost', href: PRIVACY_URL, target: '_blank', rel: 'noopener' }, `🔒 ${t('privacy')}`) : null,
     h('button', { class: 'btn secondary', onclick: () => { update({ lang: null }); relaunch(); } }, `🌍 ${t('changeLang')}`),
     deferred ? h('button', { class: 'btn primary', onclick: async () => { deferred.prompt(); deferred = null; go('profile'); } }, `📲 ${t('installApp')}`) : null,
     h('button', { class: 'btn ghost danger', onclick: () => { if (confirm(t('resetConfirm'))) { reset(); relaunch(); } } }, t('reset'))),
