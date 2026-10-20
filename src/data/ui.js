@@ -32,6 +32,7 @@ export const UI = {
     houseTitle: 'Votre marque ici', houseTag: 'Parrainez cette leçon et touchez des apprenants guinéens.', houseCta: 'Devenir sponsor',
     consentTitle: "Aide-nous à améliorer l'app", consentBody: "Avec ton accord, nous enregistrons comment tu utilises l'app : leçons terminées, réponses justes ou fausses, temps passé. Ni numéro de téléphone, ni position. Tu peux arrêter et effacer tes données à tout moment dans Profil.",
     consentName: 'Prénom ou pseudo (facultatif)', consentYes: "J'accepte", consentNo: 'Non merci',
+    privacy: 'Politique de confidentialité',
     shareUsage: "Partager mon utilisation (anonyme)", forgetMe: 'Supprimer mes données', forgotten: 'Données supprimées', yourName: 'Ton prénom ou pseudo',
   },
   en: {
