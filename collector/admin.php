@@ -172,7 +172,7 @@ if ($v === 'overview') {
     echo '</table></div>';
 
     echo '<h2>Languages chosen</h2><div class="tw"><table><tr><th>Language</th><th>Users</th></tr>';
-    foreach (q("SELECT COALESCE(NULLIF(lang,''),'?') l, COUNT(*) n FROM users GROUP BY l ORDER BY n DESC") as $r) echo '<tr><td>' . h($r['l']) . '</td><td>' . (int) $r['n'] . '</td></tr>';
+    foreach (q("SELECT COALESCE(NULLIF(lang,''),'not chosen') l, COUNT(*) n FROM users GROUP BY l ORDER BY n DESC") as $r) echo '<tr><td>' . h($r['l']) . '</td><td>' . (int) $r['n'] . '</td></tr>';
     echo '</table></div></main>';
     exit;
 }
@@ -193,7 +193,7 @@ if ($v === 'users') {
     $stmt->execute(); $us = $stmt->fetchAll();
     echo '<h2>Users</h2><form method="get" style="display:flex;gap:8px;margin-bottom:12px"><input type="hidden" name="v" value="users"><input name="q" value="' . h($qs) . '" placeholder="Search name or ID" style="flex:1"><button>Search</button> <a href="' . h($self) . '?v=csv&what=users" style="align-self:center">⬇ CSV</a></form>';
     echo '<div class="tw"><table><tr><th>User</th><th>Language</th><th>Last seen</th><th>First seen</th><th>Lessons</th><th>XP</th><th>Accuracy</th><th>Days active</th></tr>';
-    foreach ($us as $u) echo '<tr><td><a href="' . h($self) . '?v=user&id=' . h($u['uid']) . '">' . who($u) . '</a></td><td>' . h($u['lang'] ?: '?') . '</td><td>' . h(ago((int) $u['last_seen'])) . '</td><td>' . h(fdt((int) $u['first_seen'])) . '</td><td>' . (int) $u['les'] . '</td><td>' . (int) $u['xp'] . '</td><td>' . pct($u['cor'], $u['ans']) . '</td><td>' . (int) $u['days'] . '</td></tr>';
+    foreach ($us as $u) echo '<tr><td><a href="' . h($self) . '?v=user&id=' . h($u['uid']) . '">' . who($u) . '</a></td><td>' . h($u['lang'] ?: 'not chosen') . '</td><td>' . h(ago((int) $u['last_seen'])) . '</td><td>' . h(fdt((int) $u['first_seen'])) . '</td><td>' . (int) $u['les'] . '</td><td>' . (int) $u['xp'] . '</td><td>' . pct($u['cor'], $u['ans']) . '</td><td>' . (int) $u['days'] . '</td></tr>';
     if (!$us) echo '<tr><td colspan="8" class="mute">No users yet.</td></tr>';
     echo '</table></div><p>';
     if ($page > 0) echo '<a href="' . h($self) . '?v=users&q=' . urlencode($qs) . '&p=' . ($page - 1) . '">← Newer</a> ';
@@ -214,7 +214,7 @@ if ($v === 'user') {
     $cor = (int) one("SELECT COALESCE(SUM(ok),0) FROM events WHERE uid=? AND type='answer'", [$uid]);
     $days = (int) one("SELECT COUNT(DISTINCT date(ts/1000,'unixepoch')) FROM events WHERE uid=?", [$uid]);
     $sessions = (int) one('SELECT COUNT(DISTINCT sid) FROM events WHERE uid=?', [$uid]);
-    echo '<h2>' . who($u) . '</h2><p class="mute">Language: ' . h($u['lang'] ?: '?') . ' · Screen: ' . h(($dev['w'] ?? '?') . '×' . ($dev['h'] ?? '?')) . ' · Phone language: ' . h($dev['lang'] ?? '?') . ' · ' . (!empty($dev['pwa']) ? 'Installed' : 'In browser') . ' · App v' . h($u['ver'] ?: '?') . '<br>First seen ' . h(fdt((int) $u['first_seen'])) . ' · Last seen ' . h(ago((int) $u['last_seen'])) . '</p>';
+    echo '<h2>' . who($u) . '</h2><p class="mute">Language: ' . h($u['lang'] ?: 'not chosen') . ' · Screen: ' . h(($dev['w'] ?? '?') . '×' . ($dev['h'] ?? '?')) . ' · Phone language: ' . h($dev['lang'] ?? '?') . ' · ' . (!empty($dev['pwa']) ? 'Installed' : 'In browser') . ' · App v' . h($u['ver'] ?: '?') . '<br>First seen ' . h(fdt((int) $u['first_seen'])) . ' · Last seen ' . h(ago((int) $u['last_seen'])) . '</p>';
     echo '<div class="grid">';
     foreach ([[$les, 'Lessons completed'], [$xp, 'XP earned'], [pct($cor, $ans), 'Answer accuracy'], [$days, 'Days active'], [$sessions, 'Sessions']] as [$n, $l]) echo '<div class="card"><b>' . h($n) . '</b><span>' . h($l) . '</span></div>';
     echo '</div><p><a href="' . h($self) . '?v=csv&what=events&id=' . h($uid) . '">⬇ Download full history (CSV)</a></p>';

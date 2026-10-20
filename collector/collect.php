@@ -52,11 +52,12 @@ try {
 
     $dev = is_array($j['dev'] ?? null) ? json_encode(array_intersect_key($j['dev'], array_flip(['w', 'h', 'lang', 'pwa']))) : null;
     $name = $clean($j['name'] ?? '', 40);
-    $lang = null;
+    // Learning-language chosen in the app (sent with every batch). Empty/invalid = leave what we already know.
+    $lang = preg_match('/^[a-z]{2,3}$/', (string) ($j['ul'] ?? '')) ? $j['ul'] : null;
     $pdo->prepare('INSERT INTO users(uid,name,lang,dev,ver,first_seen,last_seen) VALUES(?,?,?,?,?,?,?)
                    ON CONFLICT(uid) DO UPDATE SET last_seen=excluded.last_seen, dev=COALESCE(excluded.dev,dev),
-                   ver=COALESCE(excluded.ver,ver), name=CASE WHEN excluded.name<>\'\' THEN excluded.name ELSE name END')
-        ->execute([$uid, $name ?? '', null, $dev, $clean($j['v'] ?? '', 12), $now, $now]);
+                   ver=COALESCE(excluded.ver,ver), lang=COALESCE(excluded.lang,lang), name=CASE WHEN excluded.name<>\'\' THEN excluded.name ELSE name END')
+        ->execute([$uid, $name ?? '', $lang, $dev, $clean($j['v'] ?? '', 12), $now, $now]);
 
     $ins = $pdo->prepare('INSERT OR IGNORE INTO events(uid,sid,eid,ts,rts,type,ref,ok,val,data) VALUES(?,?,?,?,?,?,?,?,?,?)');
     $accepted = 0;
@@ -78,7 +79,7 @@ try {
         if (strlen($json) > 600) $json = null;
         $ins->execute([$uid, $clean($j['sid'] ?? '', 16), $eid, $ts, $now, $type, $ref, $ok, $val, $json]);
         $accepted += $ins->rowCount();
-        if ($type === 'app_open' && isset($d['lang'])) {
+        if ($type === 'app_open' && !empty($d['lang'])) {
             $pdo->prepare('UPDATE users SET lang = ? WHERE uid = ?')->execute([$clean($d['lang'], 8), $uid]);
         }
     }
