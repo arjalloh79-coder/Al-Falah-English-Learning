@@ -35,7 +35,6 @@ export const ACT = {
   // Food & drink
   rice: eat('🍚'), fish: eat('🐟'), meat: eat('🥩'), bread: eat('🍞'), chicken: eat('🍗'), banana: eat('🍌'), mango: eat('🥭'),
   tea: drink('🍵'), water: drink('💧'),
-  tea: drink('🍵'), water: drink('💧'),
   onion: { i: '🧅', fr: 'Fais semblant d’éplucher un oignon', a: 'wave' },
   // Market & work
   buy:   { i: '🛒', fr: 'Fais semblant de payer avec de l’argent', a: 'pulse' },
@@ -46,7 +45,6 @@ export const ACT = {
   house: { i: '🏠', fr: 'Dessine un toit avec tes deux mains', a: 'rise' },
   shop:  { i: '🏬', fr: 'Fais semblant d’ouvrir la porte d’une boutique', a: 'pulse' },
   receipt: { i: '🧾', fr: 'Tends la main pour recevoir un papier', a: 'pulse' },
-  credit:  { i: '📶', fr: 'Fais semblant de taper un code sur ton téléphone', a: 'pulse' },
   credit:  { i: '📶', fr: 'Fais semblant de taper un code sur ton téléphone', a: 'pulse' },
   market:    { i: '🏪', fr: 'Fais semblant de marcher entre les étals et de regarder', a: 'pulse' },
   price:     { i: '🏷️', fr: 'Ouvre la main, paume vers le haut : « Combien ? »', a: 'pulse' },
@@ -77,11 +75,9 @@ export const ACT = {
   motorbike: { i: '🏍️', fr: 'Tiens un guidon imaginaire à deux mains', a: 'pulse' },
   bus:       { i: '🚌', fr: 'Lève la main pour arrêter le bus', a: 'rise' },
   send:      { i: '📤', fr: 'Mime l’envoi d’un message sur ton téléphone', a: 'rise' },
-  send:      { i: '📤', fr: 'Mime l’envoi d’un message sur ton téléphone', a: 'rise' },
   driver:    { i: '🚕', fr: 'Tiens un volant imaginaire à deux mains', a: 'wave' },
   balance:   { i: '📊', fr: 'Regarde l’écran de ton téléphone et lis le chiffre', a: 'nod' },
   // Health & strength
-  fever:     { i: '🌡️', fr: 'Pose la main sur ton front', a: 'nod' },
   fever:     { i: '🌡️', fr: 'Pose la main sur ton front', a: 'nod' },
   symptom:   { i: '🤒', fr: 'Pose la main là où tu as mal (la tête ou le ventre)', a: 'nod' },
   prescription: { i: '💊', fr: 'Fais semblant d’écrire une ordonnance', a: 'nod' },
