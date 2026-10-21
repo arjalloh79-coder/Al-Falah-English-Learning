@@ -120,7 +120,7 @@ try {
     $g = $pdo->prepare('SELECT COUNT(*) FROM hits WHERE ts > ?');
     $g->execute([$now - 86400]);      if ($n($g) >= (int) $c['GLOBAL_DAY'])  out(503, ['error' => 'busy']);
     $pdo->prepare('INSERT INTO hits(ip, ts) VALUES(?, ?)')->execute([$ip, $now]);
-    if (random_int(1, 50) === 1) $pdo->prepare('DELETE FROM hits WHERE ts < ?')->execute([$now - 2 * 86400]);
+    $pdo->prepare('DELETE FROM hits WHERE ts < ?')->execute([$now - 2 * 86400]);   // keep scrambled visitor codes ~2 days only
 } catch (Throwable $e) {
     error_log('assistant limiter: ' . $e->getMessage());
     out(503, ['error' => 'busy']);   // fail closed: no limiter, no spending
