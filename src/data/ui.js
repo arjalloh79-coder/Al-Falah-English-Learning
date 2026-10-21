@@ -33,6 +33,9 @@ export const UI = {
     consentTitle: "Aide-nous à améliorer l'app", consentBody: "Avec ton accord, nous enregistrons comment tu utilises l'app : leçons terminées, réponses justes ou fausses, temps passé. Ni numéro de téléphone, ni position. Tu peux arrêter et effacer tes données à tout moment dans Profil.",
     consentName: 'Prénom ou pseudo (facultatif)', consentYes: "J'accepte", consentNo: 'Non merci',
     privacy: 'Politique de confidentialité',
+    learn_s1: 'Écoute', learn_s2: 'Action', learn_s3: 'Écris', learn_t1: 'Écoute & répète', learn_t2: 'Regarde & fais', learn_t3: 'Écris ce que tu as dit',
+    learn_say: 'Dis', learn_doing: 'en le faisant.', learn_didit: "J'ai fait ✓", learn_invent: 'Invente un geste pour', learn_hint: 'Indice',
+    learn_retry: 'Presque ! Regarde bien et réessaie.', learn_almost: 'Presque ! Fais attention à l’orthographe.',
     shareUsage: "Partager mon utilisation (anonyme)", forgetMe: 'Supprimer mes données', forgotten: 'Données supprimées', yourName: 'Ton prénom ou pseudo',
   },
   en: {

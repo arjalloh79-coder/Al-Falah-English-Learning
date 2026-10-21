@@ -1,13 +1,15 @@
 import { W, P } from '../data/vocab.js';
 import { local } from '../i18n.js';
+import { ACT } from '../data/actions.js';
 
 const shuffle = (a) => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const pick = (a, n) => shuffle(a).slice(0, n);
 
 export const norm = (s) => s.toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9' ]/g, ' ').replace(/\s+/g, ' ').trim();
 
-// Build the exercise queue for a lesson.
-export function buildLesson(lesson) {
+// Build the exercise queue for a lesson. `learnCount` words get a 3-step "Mot en 3 temps" card (voice, action, writing).
+// For lessons, words that can really be acted out come first (stable order otherwise); practice keeps the weakest-first order.
+export function buildLesson(lesson, learnCount = 2, preferAct = true) {
   const words = lesson.w.map((k) => ({ k, ...W[k] }));
   const phrases = lesson.p.map((k) => ({ k, ...P[k] }));
   const pool = Object.keys(W).map((k) => ({ k, ...W[k] }));
@@ -15,6 +17,8 @@ export function buildLesson(lesson) {
   const uniq = (list) => { const en = new Set(), lb = new Set(); return list.filter((x) => (en.has(x.en) || lb.has(local(x))) ? false : (en.add(x.en), lb.add(local(x)), true)); };
   const opts = (w, n = 3) => shuffle(uniq([w, ...shuffle(words.filter((x) => x.k !== w.k)), ...shuffle(pool.filter((x) => !words.some((y) => y.k === x.k)))]).slice(0, n + 1));
   const ex = [];
+  const learnWords = preferAct ? [...words].sort((a, b) => !!ACT[b.k] - !!ACT[a.k]) : words;
+  learnWords.slice(0, learnCount).forEach((w) => ex.push({ type: 'learn', word: w }));
 
   words.forEach((w, i) => {
     const kind = i % 3;
@@ -41,7 +45,7 @@ export function buildPractice(doneIds, all, weak = {}) {
   const uniq = shuffle(src.flatMap((l) => l.w)).filter((k, i, a) => a.indexOf(k) === i);
   // weakest words first (smart review), then random fill
   const w = uniq.sort((a, b) => (weak[b] || 0) - (weak[a] || 0)).slice(0, 6);
-  return buildLesson({ id: 'practice', w, p: [] }).filter((e) => e.type !== 'speak');
+  return buildLesson({ id: 'practice', w, p: [] }, 1, false).filter((e) => e.type !== 'speak');
 }
 
 export function wordOverlap(a, b) {

@@ -17,3 +17,6 @@ Languages marked "en cours de traduction" in the picker are flagged for the same
 3. Check spelling convention (orthographe officielle / N'Ko vs Latin for Maninka) and dialect choice.
 4. Once a language is complete, remove `draft: true` in `LANGS` (`src/data/ui.js`) to drop the badge.
 5. Idea (cheap + effective): recruit reviewers from local schools/community radio; pay per 100 strings.
+
+## New strings to translate (learning card)
+The "Mot en 3 temps" card adds French-only strings: the `learn_*` keys in `src/data/ui.js` and the gesture instructions in `src/data/actions.js`. Pular, Susu and Maninka currently fall back to French for them. Ask the native-speaker reviewers to translate the instructions too.

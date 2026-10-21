@@ -2,15 +2,14 @@ import { h, mount } from '../h.js';
 import { t, local, hasLocal } from '../i18n.js';
 import { getState, update, noteWord, loseHeart, gainHeart, completeLesson, currentStreak } from '../engine/state.js';
 import { norm, wordOverlap } from '../engine/exercises.js';
-import { sfx, speak, ttsAvailable } from '../engine/audio.js';
+import { sfx, speak } from '../engine/audio.js';
 import { confetti, modal } from './shell.js';
 import { fmtMs, sponsorCard } from './shell.js';
 import { track } from '../engine/track.js';
 import { msToNextHeart } from '../engine/state.js';
+import { spk } from './speakui.js';
+import { runLearn, LEARN_XP } from './learn.js';
 
-const spk = (text, cls = '') => h('button', { class: `spk ${cls}`, 'aria-label': 'Écouter', onclick: () => { if (!speak(text) || !ttsAvailable()) hint(); } }, '🔊');
-let hinted = false;
-function hint() { if (hinted) return; hinted = true; const el = h('div', { class: 'toast' }, t('ttsMissing')); document.body.append(el); setTimeout(() => el.remove(), 3500); }
 
 const meaning = (w) => h('span', null, local(w), !hasLocal(w) ? '' : h('small', { class: 'sub' }, ` · ${w.fr}`));
 
@@ -95,7 +94,8 @@ const R = {
 function mark(list, b) { list.forEach((x) => x.classList.toggle('sel', x === b)); }
 
 export function runLesson({ id, exercises, practice, tip: lessonTip }, onExit) {
-  const total = exercises.length; let queue = [...exercises], done = 0, mistakes = 0, hrtLost = false;
+  const total = exercises.length; let queue = [...exercises], done = 0, mistakes = 0, hrtLost = false, learnXp = 0;
+  const learnN = exercises.filter((e) => e.type === 'learn').length;   // teaching cards: not scored, no hearts
   const t0 = Date.now(); let tq = t0;
   track('lesson_start', { id });
   const bar = h('i'), footer = h('footer', { class: 'foot' }), body = h('main', { class: 'screen lessonbody' });
@@ -118,6 +118,7 @@ export function runLesson({ id, exercises, practice, tip: lessonTip }, onExit) {
     if (!queue.length) return finish();
     refreshHearts(); bar.style.width = `${(done / total) * 100}%`; tq = Date.now();
     const ex = queue[0], rs = {}; let btn, resolved = false;
+    if (ex.type === 'learn') return runLearn({ body, footer, word: ex.word, lesson: id, onDone: () => { queue.shift(); done++; learnXp += LEARN_XP; step(); } });
     const ui = {
       enable: () => btn && (btn.disabled = false), disable: () => btn && (btn.disabled = true),
       submit: () => btn && !btn.disabled && btn.click(), penalty: () => { if (!hrtLost) { hrtLost = true; mistakes++; track('answer', { lesson: id, type: 'match', ok: 0 }); loseOne(); } },
@@ -154,8 +155,9 @@ export function runLesson({ id, exercises, practice, tip: lessonTip }, onExit) {
   }
   function finish() {
     bar.style.width = '100%';
-    const acc = Math.max(0, Math.round(((total - Math.min(mistakes, total)) / total) * 100));
-    const xp = practice ? 5 : 10 + (mistakes === 0 ? 5 : 0);
+    const scored = total - learnN;
+    const acc = scored > 0 ? Math.max(0, Math.round(((scored - Math.min(mistakes, scored)) / scored) * 100)) : 100;
+    const xp = (practice ? 5 : 10 + (mistakes === 0 ? 5 : 0)) + learnXp;
     let info = { streak: currentStreak() };
     if (practice) { gainHeart(); update({ xp: getState().xp + xp }); } else info = completeLesson(id, xp, mistakes === 0);
     track('lesson_complete', { id, xp, acc, mis: mistakes, ms: Math.min(Date.now() - t0, 3600000) });
