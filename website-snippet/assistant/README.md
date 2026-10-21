@@ -15,7 +15,11 @@ Visitor's browser  ->  /assistant/chat.php (your Hostinger)  ->  OpenAI
 | `chat.php` | The private go-between. Holds the key, blocks abuse, caps spending. |
 | `config.sample.php` | Template for your settings. Copy it to `config.php`. |
 | `prompt.txt` | What the assistant knows about Al-Falah. **Edit this first.** |
+| `lib.php` | Code shared by the website chat and the WhatsApp assistant (settings, spending caps, OpenAI call). **Must sit next to `chat.php`.** |
+| `whatsapp.php` | The WhatsApp assistant (optional). Setup: `WHATSAPP-SETUP.md`. |
 | `.htaccess` | Stops people downloading your settings. |
+
+> **WhatsApp:** the same assistant can answer customers on WhatsApp. See `WHATSAPP-SETUP.md`.
 
 ## Setup (about 20 minutes)
 

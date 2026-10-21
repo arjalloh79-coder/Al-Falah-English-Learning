@@ -1,5 +1,5 @@
 # Block direct access to internal files and the limiter database folder
-<FilesMatch "^(config|config\.sample)\.php$|^prompt\.txt$|^README\.md$">
+<FilesMatch "^(config|config\.sample|lib)\.php$|^prompt\.txt$|^(README|WHATSAPP-SETUP)\.md$">
   Require all denied
 </FilesMatch>
 Options -Indexes

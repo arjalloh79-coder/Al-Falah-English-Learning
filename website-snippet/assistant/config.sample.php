@@ -27,4 +27,20 @@ return [
     // dirname(__DIR__, 2) . '/afel-assistant-data'
     // Leave empty to use assistant/data/ (protected by .htaccess).
     'DATA_DIR' => '',
+
+    // ───────── WhatsApp assistant (whatsapp.php). Leave empty if you only use the website chat. ─────────
+    // Setup guide: WHATSAPP-SETUP.md. Never share these values.
+    'WA_VERIFY_TOKEN'    => '',   // any secret word you invent; you type the same word in Meta's webhook screen
+    'WA_APP_SECRET'      => '',   // Meta app > App settings > Basic > App secret
+    'WA_ACCESS_TOKEN'    => '',   // permanent access token (system user)
+    'WA_PHONE_NUMBER_ID' => '',   // WhatsApp > API setup > Phone number ID (digits only)
+
+    // A real person customers can message when they ask for one (digits, country code, no +).
+    'HUMAN_WHATSAPP' => '224611351302',
+
+    // WhatsApp spending protection and memory.
+    'WA_PER_USER_HOUR' => 15,     // messages answered per customer per hour
+    'WA_PER_USER_DAY'  => 50,     // per customer per day
+    'WA_GLOBAL_DAY'    => 300,    // per day for the whole WhatsApp channel (your safety net)
+    'MEMORY_TURNS'     => 6,      // question+answer pairs remembered for 24 hours so follow-ups make sense; 0 = remember nothing
 ];
