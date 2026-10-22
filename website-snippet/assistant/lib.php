@@ -38,7 +38,7 @@ function cfg(): array {
         'WA_PHONE_NUMBER_ID' => '',       // WhatsApp > API setup > Phone number ID (digits)
         'WA_GRAPH_VERSION' => 'v24.0',    // check Meta's changelog now and then; update if retired
         'WA_API_URL' => 'https://graph.facebook.com',
-        'HUMAN_WHATSAPP' => '224611351302',   // the number of a real person (digits, country code)
+        'HUMAN_WHATSAPP' => '12402806137',   // the number of a real person (digits, country code)
         'WA_PER_USER_HOUR' => 15,
         'WA_PER_USER_DAY' => 50,
         'WA_GLOBAL_DAY' => 300,

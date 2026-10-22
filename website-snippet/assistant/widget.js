@@ -1,7 +1,7 @@
 /* Al-Falah website assistant: chat bubble. One file, no dependencies.
    Add to any page, before </body>:
    <script src="/assistant/widget.js" defer data-af-assistant></script>
-   Optional attributes: data-endpoint="/assistant/chat.php" data-whatsapp="224611351302"
+   Optional attributes: data-endpoint="/assistant/chat.php" data-whatsapp="12402806137"
                         data-privacy="/privacy.html" data-lang="fr|en" (default: follows <html lang>)
                         data-lead="/assistant/lead.php" (the "leave my details" form; add data-lead="off" to hide it) */
 (function () {
@@ -11,7 +11,7 @@
   var me = document.currentScript || document.querySelector('script[data-af-assistant]');
   var ds = (me && me.dataset) || {};
   var ENDPOINT = ds.endpoint || '/assistant/chat.php';
-  var WA = (ds.whatsapp || '224611351302').replace(/\D/g, '');
+  var WA = (ds.whatsapp || '12402806137').replace(/\D/g, '');
   var PRIVACY = ds.privacy || '/privacy.html';
   var LEAD = ds.lead || '/assistant/lead.php';
   var STORE = 'af-assistant-v1';
