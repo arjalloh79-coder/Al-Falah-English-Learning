@@ -12,6 +12,9 @@ return [
     // openai: gpt-4o-mini). If a provider retires a model, copy the current name from its models page and uncomment:
     // 'MODEL' => 'llama-3.3-70b-versatile',
 
+    // Only for fixing problems: set any secret word, open /assistant/check.php?t=THE-WORD to see why the AI fails. Then delete check.php.
+    // 'CHECK_TOKEN' => '',
+
     // Websites allowed to use the assistant (exact address, no trailing slash).
     'ALLOWED_ORIGINS' => [
         'https://al-falahmarketing.com',
