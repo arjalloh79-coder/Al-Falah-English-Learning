@@ -47,7 +47,7 @@ return [
     'LEAD_FROM'  => '',   // sender, best on your own domain, e.g. 'assistant@al-falahmarketing.com' (create it in hPanel > Emails)
 
     // A real person customers can message when they ask for one (digits, country code, no +).
-    'HUMAN_WHATSAPP' => '224611351302',
+    'HUMAN_WHATSAPP' => '12402806137',
 
     // WhatsApp spending protection and memory.
     'WA_PER_USER_HOUR' => 15,     // messages answered per customer per hour
