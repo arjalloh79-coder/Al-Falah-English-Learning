@@ -23,8 +23,10 @@ echo 'PHP curl : ' . (function_exists('curl_init') ? 'available' : 'NOT availabl
 echo 'Data dir : ' . (is_writable($c['DATA_DIR'] !== '' ? $c['DATA_DIR'] : __DIR__) ? 'writable' : 'NOT writable') . "\n\n";
 if ($key === '' || !function_exists('curl_init')) exit;
 
+$gptoss = strpos((string) $c['MODEL'], 'gpt-oss') !== false;
 $payload = ['model' => $c['MODEL'], 'messages' => [['role' => 'user', 'content' => 'Say OK']],
-            ($c['PROVIDER'] === 'openai' ? 'max_completion_tokens' : 'max_tokens') => 5];
+            ($c['PROVIDER'] === 'openai' ? 'max_completion_tokens' : 'max_tokens') => $gptoss ? 300 : 5];
+if ($gptoss) $payload['reasoning_effort'] = 'low';
 $ch = curl_init($c['API_URL']);
 curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => json_encode($payload),
     CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Authorization: Bearer ' . $key],

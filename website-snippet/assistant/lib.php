@@ -13,7 +13,7 @@ function cfg(): array {
     // Ready-made AI providers. All three speak the same "OpenAI-style" chat protocol, so switching is a settings change only.
     $presets = [
         'openai' => ['https://api.openai.com/v1/chat/completions', 'gpt-4o-mini'],
-        'groq'   => ['https://api.groq.com/openai/v1/chat/completions', 'llama-3.3-70b-versatile'],
+        'groq'   => ['https://api.groq.com/openai/v1/chat/completions', 'openai/gpt-oss-120b'],
         'gemini' => ['https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'gemini-2.5-flash'],
     ];
     $prov = is_string($user['PROVIDER'] ?? null) && isset($presets[$user['PROVIDER']]) ? $user['PROVIDER'] : 'openai';
@@ -137,7 +137,10 @@ function openai_reply(array $msgs, string $channel = 'web'): array {
         'messages' => array_merge([['role' => 'system', 'content' => system_prompt($channel)]], $msgs),
     ];
     // OpenAI's newer models want "max_completion_tokens"; Groq and Gemini use the classic "max_tokens".
-    $payload[$c['PROVIDER'] === 'openai' ? 'max_completion_tokens' : 'max_tokens'] = (int) $c['MAX_OUTPUT_TOKENS'];
+    $max = (int) $c['MAX_OUTPUT_TOKENS'];
+    // "gpt-oss" models think before they answer; ask for little thinking and leave room so the visible answer is never cut to nothing.
+    if (strpos((string) $c['MODEL'], 'gpt-oss') !== false) { $payload['reasoning_effort'] = 'low'; $max = max($max, 1200); }
+    $payload[$c['PROVIDER'] === 'openai' ? 'max_completion_tokens' : 'max_tokens'] = $max;
     $ch = curl_init($c['API_URL']);
     curl_setopt_array($ch, [
         CURLOPT_POST => true,
