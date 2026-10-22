@@ -9,10 +9,20 @@ function cfg(): array {
     if ($c !== null) return $c;
     $f = __DIR__ . '/config.php';
     $user = is_file($f) ? (require $f) : [];
-    return $c = (is_array($user) ? $user : []) + [
+    $user = is_array($user) ? $user : [];
+    // Ready-made AI providers. All three speak the same "OpenAI-style" chat protocol, so switching is a settings change only.
+    $presets = [
+        'openai' => ['https://api.openai.com/v1/chat/completions', 'gpt-4o-mini'],
+        'groq'   => ['https://api.groq.com/openai/v1/chat/completions', 'llama-3.3-70b-versatile'],
+        'gemini' => ['https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', 'gemini-2.5-flash'],
+    ];
+    $prov = is_string($user['PROVIDER'] ?? null) && isset($presets[$user['PROVIDER']]) ? $user['PROVIDER'] : 'openai';
+    $c = $user + [
+        'PROVIDER' => $prov,
+        'AI_API_KEY' => '',               // the key of the chosen provider (same role as OPENAI_API_KEY)
         'OPENAI_API_KEY' => '',
-        'MODEL' => 'gpt-4o-mini',
-        'API_URL' => 'https://api.openai.com/v1/chat/completions',
+        'MODEL' => $presets[$prov][1],
+        'API_URL' => $presets[$prov][0],
         'ALLOWED_ORIGINS' => ['https://al-falahmarketing.com', 'https://www.al-falahmarketing.com'],
         'PER_IP_HOUR' => 20,
         'PER_IP_DAY' => 60,
@@ -33,7 +43,15 @@ function cfg(): array {
         'WA_PER_USER_DAY' => 50,
         'WA_GLOBAL_DAY' => 300,
         'MEMORY_TURNS' => 6,              // question+answer pairs remembered for 24 h; 0 = remember nothing
+        // ---- Contact form in the chat (lead.php) ----
+        'LEAD_EMAIL' => '',               // where new contact requests are emailed (empty = the form is switched off)
+        'LEAD_FROM' => '',                // sender address, ideally on your domain, e.g. assistant@al-falahmarketing.com
+        'LEAD_PER_HOUR' => 3,             // contact requests per visitor per hour
+        'LEAD_PER_DAY' => 6,
+        'LEAD_GLOBAL_DAY' => 100,
     ];
+    if ($c['AI_API_KEY'] !== '') $c['OPENAI_API_KEY'] = $c['AI_API_KEY'];
+    return $c;
 }
 
 function out(int $code, array $body) {
@@ -74,7 +92,8 @@ function db(): PDO {
                 CREATE INDEX IF NOT EXISTS hits_ts ON hits(ts);
                 CREATE TABLE IF NOT EXISTS wa_msgs(u TEXT NOT NULL, ts INTEGER NOT NULL, role TEXT NOT NULL, body TEXT NOT NULL);
                 CREATE INDEX IF NOT EXISTS wa_msgs_u ON wa_msgs(u, ts);
-                CREATE TABLE IF NOT EXISTS wa_seen(id TEXT PRIMARY KEY, ts INTEGER NOT NULL);');
+                CREATE TABLE IF NOT EXISTS wa_seen(id TEXT PRIMARY KEY, ts INTEGER NOT NULL);
+                CREATE TABLE IF NOT EXISTS leads(ts INTEGER NOT NULL, name TEXT NOT NULL, contact TEXT NOT NULL, note TEXT NOT NULL, lang TEXT NOT NULL);');
     return $pdo;
 }
 
@@ -110,14 +129,15 @@ function system_prompt(string $channel = 'web'): string {
     return $rules;
 }
 
-// Calls OpenAI. Returns [http status, reply text or null]. Logs only the status, never the key or the customer's text.
+// Calls the AI provider (OpenAI, Groq or Gemini). Returns [http status, reply text or null]. Logs only the status, never the key or the customer's text.
 function openai_reply(array $msgs, string $channel = 'web'): array {
     $c = cfg();
     $payload = [
         'model' => $c['MODEL'],
         'messages' => array_merge([['role' => 'system', 'content' => system_prompt($channel)]], $msgs),
-        'max_completion_tokens' => (int) $c['MAX_OUTPUT_TOKENS'],
     ];
+    // OpenAI's newer models want "max_completion_tokens"; Groq and Gemini use the classic "max_tokens".
+    $payload[$c['PROVIDER'] === 'openai' ? 'max_completion_tokens' : 'max_tokens'] = (int) $c['MAX_OUTPUT_TOKENS'];
     $ch = curl_init($c['API_URL']);
     curl_setopt_array($ch, [
         CURLOPT_POST => true,

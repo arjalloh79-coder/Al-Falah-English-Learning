@@ -2,7 +2,8 @@
    Add to any page, before </body>:
    <script src="/assistant/widget.js" defer data-af-assistant></script>
    Optional attributes: data-endpoint="/assistant/chat.php" data-whatsapp="224611351302"
-                        data-privacy="/privacy.html" data-lang="fr|en" (default: follows <html lang>) */
+                        data-privacy="/privacy.html" data-lang="fr|en" (default: follows <html lang>)
+                        data-lead="/assistant/lead.php" (the "leave my details" form; add data-lead="off" to hide it) */
 (function () {
   if (window.__afAssistant) return;
   window.__afAssistant = true;
@@ -12,6 +13,7 @@
   var ENDPOINT = ds.endpoint || '/assistant/chat.php';
   var WA = (ds.whatsapp || '224611351302').replace(/\D/g, '');
   var PRIVACY = ds.privacy || '/privacy.html';
+  var LEAD = ds.lead || '/assistant/lead.php';
   var STORE = 'af-assistant-v1';
 
   var T = {
@@ -24,7 +26,13 @@
       errGeneric: 'Désolé, je n’arrive pas à répondre pour le moment. Vous pouvez nous écrire directement sur WhatsApp.',
       errLimit: 'Vous avez posé beaucoup de questions. Réessayez plus tard ou écrivez-nous sur WhatsApp.',
       errBusy: 'L’assistant est très sollicité en ce moment. Écrivez-nous sur WhatsApp, nous répondons vite.',
-      waText: 'Bonjour, je vous contacte depuis le site Al-Falah Marketing.'
+      waText: 'Bonjour, je vous contacte depuis le site Al-Falah Marketing.',
+      leadLink: 'Être rappelé(e)', leadTitle: 'Laissez vos coordonnées, nous vous répondons rapidement.',
+      leadName: 'Votre nom', leadContact: 'Téléphone/WhatsApp ou e-mail', leadNote: 'Votre besoin (facultatif)',
+      leadConsent: 'J’accepte que Al-Falah Marketing me contacte au sujet de ma demande.', leadSend: 'Envoyer', leadCancel: 'Annuler',
+      leadOk: 'Merci ! Nous vous contactons très bientôt.', leadErrName: 'Écrivez votre nom.',
+      leadErrContact: 'Entrez un numéro de téléphone ou un e-mail valide.', leadErrConsent: 'Cochez la case pour continuer.',
+      leadErrFail: 'Envoi impossible pour le moment. Écrivez-nous sur WhatsApp.'
     },
     en: {
       open: 'Need help?', title: 'Al-Falah Assistant', ai: 'AI', close: 'Close', reset: 'New conversation',
@@ -35,7 +43,13 @@
       errGeneric: 'Sorry, I can’t answer right now. You can message us directly on WhatsApp.',
       errLimit: 'You’ve asked a lot of questions. Please try again later or message us on WhatsApp.',
       errBusy: 'The assistant is very busy right now. Message us on WhatsApp, we reply quickly.',
-      waText: 'Hello, I’m contacting you from the Al-Falah Marketing website.'
+      waText: 'Hello, I’m contacting you from the Al-Falah Marketing website.',
+      leadLink: 'Request a call back', leadTitle: 'Leave your details and we’ll get back to you quickly.',
+      leadName: 'Your name', leadContact: 'Phone/WhatsApp or email', leadNote: 'What you need (optional)',
+      leadConsent: 'I agree that Al-Falah Marketing may contact me about my request.', leadSend: 'Send', leadCancel: 'Cancel',
+      leadOk: 'Thank you! We’ll contact you very soon.', leadErrName: 'Please enter your name.',
+      leadErrContact: 'Enter a valid phone number or email.', leadErrConsent: 'Tick the box to continue.',
+      leadErrFail: 'Could not send right now. Please message us on WhatsApp.'
     }
   };
 
@@ -84,6 +98,14 @@
     'textarea{flex:1;resize:none;max-height:110px;min-height:44px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--ivory);padding:10px 12px;font-size:16px;line-height:1.35}' +
     'textarea::placeholder{color:var(--mute)}' +
     '.send{background:var(--gold);color:var(--navy);border:0;border-radius:12px;height:44px;padding:0 16px;font-weight:800}.send:disabled{opacity:.5;cursor:default}' +
+    '.lead{align-self:stretch;background:var(--card);border:1px solid var(--gold);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px}' +
+    '.lead p{margin:0;font-weight:700}' +
+    '.lead input[type=text],.lead textarea{width:100%;background:var(--navy);border:1px solid var(--line);border-radius:10px;color:var(--ivory);padding:10px 12px;font-size:16px;min-height:44px}' +
+    '.lead textarea{min-height:64px;max-height:110px}' +
+    '.lead label.c{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;color:var(--mute)}.lead label.c input{margin-top:3px;width:18px;height:18px;flex:none}' +
+    '.lead .row{display:flex;gap:8px}.lead .row button{flex:1;border-radius:10px;height:44px;font-weight:800;border:1px solid var(--gold)}' +
+    '.lead .go{background:var(--gold);color:var(--navy)}.lead .no{background:none;color:var(--gold2)}' +
+    '.lead .e{color:#ffb3bd;font-size:13.5px;min-height:1em}.lead .hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}' +
     '.meta{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;margin-top:8px;font-size:12.5px;color:var(--mute)}' +
     '.meta a{color:var(--gold2)}' +
     '@media (max-width:520px){.wrap{right:12px;bottom:12px}.launch .lbl{display:none}.launch{padding:0 14px}' +
@@ -101,7 +123,8 @@
     '<div class="log" id="log" role="log" aria-live="polite"></div>' +
     '<div class="ft"><form id="form" autocomplete="off"><textarea id="inp" rows="1" maxlength="600"></textarea>' +
     '<button class="send" id="send" type="submit"></button></form>' +
-    '<div class="meta"><span id="note"></span><span><a id="wa" target="_blank" rel="noopener"></a> · <a id="pv" target="_blank" rel="noopener"></a></span></div></div>' +
+    '<div class="meta"><span id="note"></span><span><a id="wa" target="_blank" rel="noopener"></a> · <a id="pv" target="_blank" rel="noopener"></a></span>' +
+    '<button type="button" id="ld" class="chip" style="padding:5px 11px;font-size:13px"></button></div></div>' +
     '</div></div>';
 
   var $ = function (id) { return root.getElementById ? root.getElementById(id) : root.querySelector('#' + id); };
@@ -119,6 +142,7 @@
     sendBtn.textContent = t('send'); $('note').textContent = t('note');
     var w = $('wa'); w.textContent = t('wa'); w.href = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(t('waText'));
     var p = $('pv'); p.textContent = t('privacy'); p.href = PRIVACY;
+    var ld = $('ld'); ld.textContent = t('leadLink'); ld.style.display = ds.lead === 'off' ? 'none' : '';
   }
 
   // Safe text rendering: only text nodes, **bold** and clickable https links. Never innerHTML.
@@ -149,6 +173,42 @@
       log.appendChild(c);
     }
     msgs.forEach(function (m) { bubble(m.role === 'user' ? 'me' : 'bot', m.content); });
+    if (leadOpen) leadForm();
+  }
+
+  // "Leave my details" form. Built with DOM calls only (no innerHTML). Needs the visitor's consent; sent to lead.php.
+  var leadOpen = false;
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; }
+  function leadForm() {
+    var f = el('form', 'lead'); f.noValidate = true;
+    var title = el('p', '', t('leadTitle'));
+    var name = el('input'); name.type = 'text'; name.maxLength = 80; name.placeholder = t('leadName'); name.setAttribute('aria-label', t('leadName')); name.autocomplete = 'name';
+    var contact = el('input'); contact.type = 'text'; contact.maxLength = 120; contact.placeholder = t('leadContact'); contact.setAttribute('aria-label', t('leadContact')); contact.autocomplete = 'tel'; contact.inputMode = 'text';
+    var note = el('textarea'); note.maxLength = 400; note.placeholder = t('leadNote'); note.setAttribute('aria-label', t('leadNote'));
+    var hp = el('input', 'hp'); hp.type = 'text'; hp.tabIndex = -1; hp.autocomplete = 'off'; hp.setAttribute('aria-hidden', 'true');
+    var lab = el('label', 'c'); var cb = el('input'); cb.type = 'checkbox'; lab.appendChild(cb); lab.appendChild(el('span', '', t('leadConsent')));
+    var pv = el('a', '', t('privacy')); pv.href = PRIVACY; pv.target = '_blank'; pv.rel = 'noopener'; pv.style.cssText = 'color:var(--gold2);font-size:13px';
+    var err = el('div', 'e'); err.setAttribute('role', 'alert');
+    var row = el('div', 'row'); var go = el('button', 'go', t('leadSend')); go.type = 'submit'; var no = el('button', 'no', t('leadCancel')); no.type = 'button';
+    row.appendChild(go); row.appendChild(no);
+    [title, name, contact, note, hp, lab, pv, err, row].forEach(function (n) { f.appendChild(n); });
+    no.addEventListener('click', function () { leadOpen = false; render(); });
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (name.value.trim().length < 2) { err.textContent = t('leadErrName'); name.focus(); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.value.trim()) && !/^[+\d][\d\s().-]{5,}$/.test(contact.value.trim())) { err.textContent = t('leadErrContact'); contact.focus(); return; }
+      if (!cb.checked) { err.textContent = t('leadErrConsent'); cb.focus(); return; }
+      go.disabled = true; err.textContent = '';
+      fetch(LEAD, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.value, contact: contact.value, note: note.value, consent: true, website: hp.value, lang: lang }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { s: r.status, j: j }; }); })
+        .then(function (res) {
+          if (res.s === 200 && res.j.ok) { leadOpen = false; render(); bubble('bot', t('leadOk')); }
+          else { go.disabled = false; err.textContent = res.j.error === 'contact' ? t('leadErrContact') : res.j.error === 'name' ? t('leadErrName') : t('leadErrFail'); }
+        }).catch(function () { go.disabled = false; err.textContent = t('leadErrFail'); });
+    });
+    log.appendChild(f); log.scrollTop = log.scrollHeight;
+    setTimeout(function () { name.focus(); }, 0);
   }
 
   function ask(text) {
@@ -179,7 +239,8 @@
 
   launch.addEventListener('click', open);
   $('close').addEventListener('click', close);
-  $('reset').addEventListener('click', function () { msgs = []; save(); render(); });
+  $('reset').addEventListener('click', function () { msgs = []; leadOpen = false; save(); render(); });
+  $('ld').addEventListener('click', function () { leadOpen = true; render(); });
   $('form').addEventListener('submit', function (e) { e.preventDefault(); var v = inp.value; inp.value = ''; inp.style.height = ''; ask(v); });
   inp.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('form').requestSubmit ? $('form').requestSubmit() : sendBtn.click(); } });
   inp.addEventListener('input', function () { inp.style.height = 'auto'; inp.style.height = Math.min(inp.scrollHeight, 110) + 'px'; });
