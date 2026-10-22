@@ -1,12 +1,16 @@
 <?php
 // Copy this file to config.php (same folder), then edit. NEVER upload config.php to GitHub or share it.
 return [
-    // Your OpenAI API key (platform.openai.com > API keys). Starts with "sk-".
-    'OPENAI_API_KEY' => '',
+    // Which AI service answers: 'groq' (free, no card, recommended), 'gemini' (free tier) or 'openai' (paid).
+    'PROVIDER' => 'groq',
 
-    // The AI model used. A small, cheap model is plenty for a website assistant.
-    // Check platform.openai.com/docs/models for the current options and prices.
-    'MODEL' => 'gpt-4o-mini',
+    // The secret key of that service. Groq keys start with "gsk_", Gemini with "AIza", OpenAI with "sk-".
+    // Groq: console.groq.com > API Keys. Gemini: aistudio.google.com > Get API key.
+    'AI_API_KEY' => '',
+
+    // Leave MODEL out to use the default of your provider (groq: llama-3.3-70b-versatile, gemini: gemini-2.5-flash,
+    // openai: gpt-4o-mini). If a provider retires a model, copy the current name from its models page and uncomment:
+    // 'MODEL' => 'llama-3.3-70b-versatile',
 
     // Websites allowed to use the assistant (exact address, no trailing slash).
     'ALLOWED_ORIGINS' => [
@@ -34,6 +38,10 @@ return [
     'WA_APP_SECRET'      => '',   // Meta app > App settings > Basic > App secret
     'WA_ACCESS_TOKEN'    => '',   // permanent access token (system user)
     'WA_PHONE_NUMBER_ID' => '',   // WhatsApp > API setup > Phone number ID (digits only)
+
+    // ───────── "Leave my details" form in the chat (lead.php) ─────────
+    'LEAD_EMAIL' => '',   // your email: every request is sent here. Empty = the form is switched off.
+    'LEAD_FROM'  => '',   // sender, best on your own domain, e.g. 'assistant@al-falahmarketing.com' (create it in hPanel > Emails)
 
     // A real person customers can message when they ask for one (digits, country code, no +).
     'HUMAN_WHATSAPP' => '224611351302',

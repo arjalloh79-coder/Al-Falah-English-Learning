@@ -12,6 +12,7 @@ Visitor's browser  ->  /assistant/chat.php (your Hostinger)  ->  OpenAI
 | File | What it does |
 |---|---|
 | `widget.js` | The chat bubble people see. Add one line to your site to show it. |
+| `lead.php` | The "Request a call back" form in the bubble: emails you the visitor's name and phone/email (with their consent). |
 | `chat.php` | The private go-between. Holds the key, blocks abuse, caps spending. |
 | `config.sample.php` | Template for your settings. Copy it to `config.php`. |
 | `prompt.txt` | What the assistant knows about Al-Falah. **Edit this first.** |
@@ -23,7 +24,14 @@ Visitor's browser  ->  /assistant/chat.php (your Hostinger)  ->  OpenAI
 
 ## Setup (about 20 minutes)
 
-### 1. Get the OpenAI key and set a spending limit
+### 1a. FREE option (no card): Groq
+1. Go to console.groq.com, sign up (email or Google). No payment details are asked.
+2. **API Keys > Create API Key**. Copy it (starts with `gsk_`). Never paste it in chat, email or GitHub.
+3. In `config.php` set `'PROVIDER' => 'groq'` and `'AI_API_KEY' => 'gsk_...'`. Skip the OpenAI steps below.
+4. Free plans have daily limits. When one is reached the bubble politely sends visitors to WhatsApp. Check Groq's *Rate limits* page for the current numbers.
+Alternative: `'PROVIDER' => 'gemini'` with a key from aistudio.google.com. Free Gemini usage may be used by Google to improve its products, so prefer Groq for visitor questions.
+
+### 1b. Paid option: OpenAI (get the key and set a spending limit)
 1. Go to platform.openai.com and sign in. Add a small credit (for example $10) under **Billing**. This is separate from a ChatGPT subscription.
 2. In **Billing > Limits**, set a **monthly budget** (for example $10 to $20). Do this before anything else.
 3. **API keys > Create new secret key**. Copy it. You will not see it again.
