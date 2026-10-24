@@ -130,6 +130,9 @@
   var $ = function (id) { return root.getElementById ? root.getElementById(id) : root.querySelector('#' + id); };
   var wrap = $('wrap'), log = $('log'), inp = $('inp'), sendBtn = $('send'), launch = $('launch');
   var busy = false;
+  var sentOnce = false;
+  // Reports to Google Analytics through the site's tracker when it is loaded and the visitor accepted cookies.
+  function tr(name, params) { try { if (window.afTrack) window.afTrack(name, params); } catch (e) { /* tracking must never break the chat */ } }
 
   function labels() {
     $('open').textContent = t('open');
@@ -203,7 +206,7 @@
         body: JSON.stringify({ name: name.value, contact: contact.value, note: note.value, consent: true, website: hp.value, lang: lang }) })
         .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { s: r.status, j: j }; }); })
         .then(function (res) {
-          if (res.s === 200 && res.j.ok) { leadOpen = false; render(); bubble('bot', t('leadOk')); }
+          if (res.s === 200 && res.j.ok) { leadOpen = false; render(); bubble('bot', t('leadOk')); tr('generate_lead', { method: 'chat_callback' }); }
           else { go.disabled = false; err.textContent = res.j.error === 'contact' ? t('leadErrContact') : res.j.error === 'name' ? t('leadErrName') : t('leadErrFail'); }
         }).catch(function () { go.disabled = false; err.textContent = t('leadErrFail'); });
     });
@@ -215,6 +218,7 @@
     text = String(text || '').trim().slice(0, 600);
     if (!text || busy) return;
     busy = true; sendBtn.disabled = true;
+    if (!sentOnce) { sentOnce = true; tr('chat_message'); }
     msgs.push({ role: 'user', content: text }); save(); render();
     var typing = document.createElement('div'); typing.className = 'typing'; typing.textContent = t('typing'); log.appendChild(typing); log.scrollTop = log.scrollHeight;
     var ctl = window.AbortController ? new AbortController() : null;
@@ -232,7 +236,7 @@
   }
 
   function open() {
-    wrap.classList.add('open'); launch.setAttribute('aria-expanded', 'true'); render();
+    wrap.classList.add('open'); launch.setAttribute('aria-expanded', 'true'); render(); tr('chat_open');
     if (window.matchMedia && matchMedia('(min-width:521px)').matches) inp.focus();
   }
   function close() { wrap.classList.remove('open'); launch.setAttribute('aria-expanded', 'false'); launch.focus(); }
@@ -254,6 +258,7 @@
   }
 
   labels();
+  $('wa').addEventListener('click', function () { tr('generate_lead', { method: 'chat_whatsapp' }); });
   function mount() { document.body.appendChild(host); }
   if (document.body) mount(); else document.addEventListener('DOMContentLoaded', mount);
 })();

@@ -4,15 +4,15 @@ Customers message a WhatsApp number. The same assistant as your website chat ans
 If they ask for a person, it sends them to your own number.
 
 ```
-Customer on WhatsApp  ->  Meta (WhatsApp Business Platform)  ->  https://al-falahmarketing.com/assistant/whatsapp.php  ->  OpenAI
+Customer on WhatsApp  ->  Meta (WhatsApp Business Platform)  ->  https://al-falahmarketing.com/assistant/whatsapp.php  ->  AI provider (Groq, free)
         <-------------------------- the answer comes back the same way ---------------------------
 ```
 
 ## Read this first (3 minutes, saves you a lot of trouble)
 
-1. **The assistant needs its OWN WhatsApp number.** A number connected to this system normally cannot also be used in the normal WhatsApp or WhatsApp Business phone app. **Do not connect your main business number** (+224 611 351 302). Keep that one for real people: the assistant sends customers there when they ask for a person.
+1. **The assistant needs its OWN WhatsApp number.** A number connected to this system normally cannot also be used in the normal WhatsApp or WhatsApp Business phone app. **Do not connect your main business number** (+1 240-280-6137) **or your Guinea number** (+224 611 351 302). Keep those for real people: the assistant sends customers to +1 240-280-6137 when they ask for a person.
 2. **Start with Meta's free test number.** It needs no SIM and no payment. You can test with up to 5 phone numbers that you add yourself. Move to a real number only after the tests pass.
-3. **The assistant never starts a conversation.** It only answers customers who write first. This matters for cost: replies sent within 24 hours of the customer's message are not charged by WhatsApp at the time of writing (check Meta's pricing page for "service conversations"). You pay only OpenAI, a fraction of a cent per answer.
+3. **The assistant never starts a conversation.** It only answers customers who write first. This matters for cost: replies sent within 24 hours of the customer's message are not charged by WhatsApp at the time of writing (check Meta's pricing page for "service conversations"). The AI answers are free on Groq's free plan (it has daily limits; when one is reached the assistant stays silent politely). The same free brain, key and `prompt.txt` as your website chat are used: nothing to add for the AI.
 4. **Meta's screens change often.** If a button has a slightly different name, look for the closest one.
 
 ## Step 1. Meta accounts (15 minutes)
@@ -43,7 +43,8 @@ Never paste these values in chat, email or WhatsApp. If one leaks, regenerate it
     'WA_ACCESS_TOKEN'    => 'the access token',
     'WA_PHONE_NUMBER_ID' => 'the phone number id',
 ```
-3. Keep `HUMAN_WHATSAPP` as your real person's number (digits only, no +).
+3. `HUMAN_WHATSAPP` is already `12402806137` by default (digits only, no +). Add `'HUMAN_WHATSAPP' => '12402806137',` only if you want a different person.
+4. **Do not touch** `PROVIDER`, `AI_API_KEY` and `MODEL`: they are already set for the website chat and the WhatsApp assistant uses them too.
 
 ## Step 4. Connect the webhook
 1. In Meta: **WhatsApp > Configuration > Webhook > Edit**.
@@ -72,25 +73,25 @@ Send these from your own WhatsApp to the test number:
 
 ## Safety built in
 - **Only Meta can talk to it.** Every message is checked with a secret signature; forged ones are refused.
-- **Spending caps** (change in `config.php`): 15 questions per customer per hour, 50 per day, 300 per day for all of WhatsApp. When a cap is reached the customer gets one polite message, then silence (no endless loops). Also keep your monthly budget set in OpenAI.
+- **Spending caps** (change in `config.php`): 15 questions per customer per hour, 50 per day, 300 per day for all of WhatsApp. When a cap is reached the customer gets one polite message, then silence (no endless loops). The free Groq plan has its own daily limits (see Groq's Rate limits page).
 - **Always honest:** the first reply says it is an AI. `HUMAIN` gives a real person. `STOP` deletes the conversation.
 - **Short memory:** the last 6 questions and answers are remembered for 24 hours so follow-ups make sense. They are stored with a scrambled code, not the phone number. Set `MEMORY_TURNS` to `0` to remember nothing.
 - **Nothing sensitive in logs:** tokens, keys and message text are never written to the error log.
 - **Plain text only:** answers are cleaned for WhatsApp, and no link is added that you did not write in `prompt.txt`.
 
 ## Troubleshooting
-Read the errors in hPanel > **Advanced > Error logs**.
+If your hosting plan has no error log, use the diagnostic page (`check.php`, see the main README): it shows the exact reason the AI fails. Otherwise read the errors in hPanel > **Advanced > Error logs**.
 
 | What you see | Likely cause / fix |
 |---|---|
 | "Verify and save" fails | Verify token differs from `WA_VERIFY_TOKEN`, or `whatsapp.php` / `lib.php` was not uploaded |
 | Customer writes, nothing comes back | Webhook not subscribed to `messages`, or wrong `WA_PHONE_NUMBER_ID` |
 | Worked for a day, then stopped | The 24-hour test token expired. The log shows `whatsapp send: status 401`. Create the permanent token |
-| Log shows `assistant upstream: status 401` | Wrong OpenAI key, or no OpenAI credit |
-| Log shows `assistant upstream: status 404` or `400` | The model name in `config.php` is no longer available: choose a current small model |
+| Log shows `assistant upstream: status 401` | Wrong AI key in `config.php` (`AI_API_KEY`) |
+| Log shows `assistant upstream: status 404` or `400` | The AI model was retired: open Groq's models page, copy a current model name and put it in `'MODEL' => '...'` in `config.php` |
 | Website chat suddenly gives errors | `lib.php` is missing next to `chat.php` |
 | Test number will not reply to a friend | Test numbers only talk to recipients you added in API Setup |
 | Meta's API version retired (rare) | Update `WA_GRAPH_VERSION` in `config.php` (see Meta's changelog) |
 
 ## What to tell your customers (privacy)
-Your privacy notice already has a "WhatsApp assistant" section: messages go to OpenAI to be answered, the last few messages are remembered for 24 hours, and `STOP` deletes them.
+Your privacy notice already has a "WhatsApp assistant" section: messages go to an AI provider (currently Groq) to be answered, the last few messages are remembered for 24 hours, and `STOP` deletes them.
